@@ -9,7 +9,7 @@ from selenium.webdriver.chrome.options import Options
 from discord.utils import get_slots
 from discord import FFmpegPCMAudio
 
-token = "token"
+token = ""
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -63,12 +63,15 @@ async def URLplay(ctx, *, url):
 @bot.command()
 async def play(ctx, *, msg):
     if not vc.is_playing():
+        options = webdriver.ChromeOptions()
+        options.add_argument("handless")
+
         global entireText
         YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist':'True'}
         FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
             
         chromedriver_dir = r"C:\code\py\Kong\chromedriver.exe"
-        driver = webdriver.Chrome(chromedriver_dir)
+        driver = webdriver.Chrome(chromedriver_dir, options = options)
         driver.get("https://www.youtube.com/results?search_query="+msg+"+lyrics")
         source = driver.page_source
         bs = bs4.BeautifulSoup(source, 'lxml')
@@ -77,6 +80,8 @@ async def play(ctx, *, msg):
         entireText = entireNum.text.strip()
         musicurl = entireNum.get('href')
         url = 'https://www.youtube.com'+ musicurl 
+
+        driver.quit()
 
         with YoutubeDL(YDL_OPTIONS) as ydl:
             info = ydl.extract_info(url, download=False)
